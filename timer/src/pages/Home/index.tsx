@@ -22,28 +22,30 @@ const newCycleFormValidationSchema = zod.object({
   minutesAmount: zod
     .number()
     .min(5, "Valor mínimo deve ser 5 minutos")
-    .max(60, "Valor máximo deve ser 60 minutos")
-})
+    .max(60, "Valor máximo deve ser 60 minutos"),
+});
 
-type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
+type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
 export function Home() {
-  const { register, handleSubmit, watch, formState } = useForm<NewCycleFormData>({
-    resolver: zodResolver(newCycleFormValidationSchema),
-    defaultValues: {
-      task: '',
-      minutesAmount: 5
-    }
-  });
+  const { register, handleSubmit, watch, formState, reset } =
+    useForm<NewCycleFormData>({
+      resolver: zodResolver(newCycleFormValidationSchema),
+      defaultValues: {
+        task: "",
+        minutesAmount: 5,
+      },
+    });
 
   function handleCreateNewCycle(data: any) {
     console.log(data);
+    reset();
   }
 
   const task = watch("task");
   const isSubmitDisabled = !task;
 
-console.log(formState.errors) // como captura as validaçoes de erro usando o react use form
+  console.log(formState.errors); // como captura as validaçoes de erro usando o react use form
 
   return (
     <HomeContainer>
