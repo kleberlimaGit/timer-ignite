@@ -1,4 +1,4 @@
-import { Play } from "phosphor-react";
+import { HandPalm, Play } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { differenceInSeconds } from "date-fns";
@@ -12,6 +12,7 @@ import {
   MinuteAmountInput,
   Separator,
   StartCountDownButton,
+  StopCountDownButton,
   TaskInput,
 } from "./styles";
 
@@ -34,6 +35,7 @@ interface Cycle {
   task: string;
   minutesAmount: number;
   startDate: Date;
+  interruptedDate?: Date;
 }
 
 export function Home() {
@@ -60,8 +62,25 @@ export function Home() {
 
     setCycles((state) => [...state, newCycle]);
     setActiveCycleId(newCycle.id);
-    setAmountSecondPassed(0)
+    setAmountSecondPassed(0);
     reset();
+  }
+
+  function handleInterrupteCycle() {
+
+    setCycles(
+      cycles.map((cycle) => {
+        if (activeCycleId === cycle.id) {
+          return { ...cycle, interruptedDate: new Date() };
+        } else {
+          return cycle;
+        }
+      })
+    );
+
+    setActiveCycleId(null);
+    document.title = "Ignite Timer"
+
   }
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
@@ -81,24 +100,26 @@ export function Home() {
     let interval: number;
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondPassed(differenceInSeconds(new Date(),activeCycle.startDate))
+        setAmountSecondPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate)
+        );
       }, 1000);
 
       setTimeout(() => {
-        clearInterval(interval)
-      }, totalSeconds*1000);
+        clearInterval(interval);
+        setActiveCycleId(null);
+      }, totalSeconds * 1000);
     }
-    return ( () => {
-      clearInterval(interval)
-    }
-  )
+    return () => {
+      clearInterval(interval);
+    };
   }, [activeCycle]);
 
   useEffect(() => {
-      if(activeCycle){
-        document.title = `Ignite Timer ${minutes}:${seconds}`
-      }
-  }, [minutes,seconds,activeCycle])
+    if (activeCycle) {
+      document.title = `Ignite Timer ${minutes}:${seconds}`;
+    }
+  }, [minutes, seconds, activeCycle]);
 
   const task = watch("task");
   const isSubmitDisabled = !task;
@@ -114,6 +135,7 @@ export function Home() {
             type="text"
             id="task"
             placeholder="Dê um nome para o seu projeto"
+            disabled={!!activeCycle}
             {...register("task")}
           />
 
@@ -125,6 +147,7 @@ export function Home() {
             step={5}
             min={5}
             max={60}
+            disabled={!!activeCycle}
             required
             {...register("minutesAmount", { valueAsNumber: true })}
           />
@@ -140,10 +163,17 @@ export function Home() {
           <span>{seconds[1]}</span>
         </CountdownContainer>
 
-        <StartCountDownButton disabled={isSubmitDisabled} type="submit">
-          <Play />
-          Começar
-        </StartCountDownButton>
+        {activeCycle ? (
+          <StopCountDownButton onClick={handleInterrupteCycle} type="button">
+            <HandPalm />
+            Interromper
+          </StopCountDownButton>
+        ) : (
+          <StartCountDownButton disabled={isSubmitDisabled} type="submit">
+            <Play />
+            Começar
+          </StartCountDownButton>
+        )}
       </form>
     </HomeContainer>
   );
