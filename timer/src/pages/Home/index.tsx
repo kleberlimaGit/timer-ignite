@@ -1,8 +1,9 @@
 import { Play } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { differenceInSeconds } from "date-fns";
 import * as zod from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   CountdownContainer,
@@ -32,11 +33,13 @@ interface Cycle {
   id: string;
   task: string;
   minutesAmount: number;
+  startDate: Date;
 }
 
 export function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
+  const [amountSecondsPassed, setAmountSecondPassed] = useState(0);
 
   const { register, handleSubmit, watch, formState, reset } =
     useForm<NewCycleFormData>({
@@ -52,16 +55,50 @@ export function Home() {
       id: String(new Date().getTime()),
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(),
     };
 
     setCycles((state) => [...state, newCycle]);
     setActiveCycleId(newCycle.id);
+    setAmountSecondPassed(0)
     reset();
   }
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
 
-  console.log(activeCycle)
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
+
+  const minutesAmount = Math.floor(currentSeconds / 60);
+  const secondsAmount = currentSeconds % 60;
+
+  const minutes = String(minutesAmount).padStart(2, "0");
+  const seconds = String(secondsAmount).padStart(2, "0");
+
+  console.log(activeCycle);
+
+  useEffect(() => {
+    let interval: number;
+    if (activeCycle) {
+      interval = setInterval(() => {
+        setAmountSecondPassed(differenceInSeconds(new Date(),activeCycle.startDate))
+      }, 1000);
+
+      setTimeout(() => {
+        clearInterval(interval)
+      }, totalSeconds*1000);
+    }
+    return ( () => {
+      clearInterval(interval)
+    }
+  )
+  }, [activeCycle]);
+
+  useEffect(() => {
+      if(activeCycle){
+        document.title = `Ignite Timer ${minutes}:${seconds}`
+      }
+  }, [minutes,seconds,activeCycle])
 
   const task = watch("task");
   const isSubmitDisabled = !task;
@@ -96,11 +133,11 @@ export function Home() {
         </FormContainer>
 
         <CountdownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdownContainer>
 
         <StartCountDownButton disabled={isSubmitDisabled} type="submit">
