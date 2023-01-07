@@ -24,14 +24,18 @@ export function CountDown() {
     let interval: number;
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecond();
-      }, 1000);
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate
+        );
 
-      setTimeout(() => {
-        activeCycle.finishedDate = new Date();
-        markCycleAsFinishedDate(activeCycle);
-        clearInterval(interval);
-      }, totalSeconds * 1010);
+        if (secondsDifference >= totalSeconds) {
+          markCycleAsFinishedDate();
+        }else{
+          setAmountSecond(secondsDifference);
+        }
+
+      }, 1000);
     }
     return () => {
       clearInterval(interval);

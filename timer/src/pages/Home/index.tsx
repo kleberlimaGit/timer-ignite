@@ -26,7 +26,7 @@ export function Home() {
     task: zod.string().min(1, "Informe a tarefa"),
     minutesAmount: zod
       .number()
-      .min(5, "Valor mínimo deve ser 5 minutos")
+      .min(1, "Valor mínimo deve ser 5 minutos")
       .max(60, "Valor máximo deve ser 60 minutos"),
   });
 
@@ -42,6 +42,10 @@ export function Home() {
   const { handleSubmit, watch, formState, reset } = newCycleForm;
   // console.log(formState.errors); // como captura as validaçoes de erro usando o react use form
 
+  function handleCreateNewCycle(data: NewCycleFormData){
+    CreateNewCycle(data)
+    reset();
+  }
 
 
   const task = watch("task");
@@ -49,7 +53,7 @@ export function Home() {
 
   return (
     <HomeContainer>
-      <form onSubmit={handleSubmit(CreateNewCycle)}>
+      <form onSubmit={handleSubmit(handleCreateNewCycle)}>
         <FormProvider {...newCycleForm}>
           <NewCycleForm />
         </FormProvider>

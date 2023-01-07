@@ -1,5 +1,4 @@
-import { differenceInSeconds } from "date-fns";
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useState, useReducer } from "react";
 
 interface Cycle {
   id: string;
@@ -11,12 +10,12 @@ interface Cycle {
 }
 
 interface CyclesContextData {
-  cycles: Cycle[]
+  cycles: Cycle[];
   activeCycle: Cycle | undefined;
   activeCycleId: String | null;
-  markCycleAsFinishedDate: (activeCycle: Cycle) => void;
+  markCycleAsFinishedDate: () => void;
   amountSecondsPassed: number;
-  setAmountSecond: () => void;
+  setAmountSecond: (diff:number) => void;
   CreateNewCycle: (data: CreateCycleData) => void;
   InterrupteCycle: () => void;
 }
@@ -41,17 +40,22 @@ export function CyclesContextProvider({
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
 
-  function markCycleAsFinishedDate(activeCycle: Cycle) {
-    setCycles((state) => [...state, activeCycle]);
-    setActiveCycleId(null);
+  function markCycleAsFinishedDate() {
+    setCycles((state) =>
+      state.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+            setActiveCycleId(null)
+          return { ...cycle, finishedDate: new Date() };
+        } else {
+          return cycle;
+        }
+      })
+    );
   }
 
-  function setAmountSecond() {
-    if (activeCycle) {
-      setAmountSecondPassed(
-        differenceInSeconds(new Date(), activeCycle.startDate)
-      );
-    }
+  function setAmountSecond(diff: number) {
+      setAmountSecondPassed(diff);
+
   }
 
   function CreateNewCycle(data: CreateCycleData) {
@@ -65,12 +69,11 @@ export function CyclesContextProvider({
     setCycles((state) => [...state, newCycle]);
     setActiveCycleId(newCycle.id);
     setAmountSecondPassed(0);
-    // reset();
   }
 
   function InterrupteCycle() {
-    setCycles(
-      cycles.map((cycle) => {
+    setCycles((state) =>
+      state.map((cycle) => {
         if (activeCycleId === cycle.id) {
           return { ...cycle, interruptedDate: new Date() };
         } else {
@@ -93,7 +96,7 @@ export function CyclesContextProvider({
         setAmountSecond,
         CreateNewCycle,
         InterrupteCycle,
-        cycles
+        cycles,
       }}
     >
       {children}
