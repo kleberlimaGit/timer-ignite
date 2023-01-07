@@ -1,13 +1,10 @@
 import { useContext } from "react";
-import { useForm } from "react-hook-form/dist/useForm";
-import { CyclesContext } from "../..";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as zod from "zod";
 import { FormContainer, MinuteAmountInput, TaskInput } from "./styles";
 import { useFormContext } from "react-hook-form";
+import { CyclesContext } from "../../../../contexts/CycleContext";
 
 export function NewCycleForm() {
-  const { activeCycle, activeCycleId, markCycleAsFinishedDate } =
+  const { activeCycle } =
     useContext(CyclesContext);
 
     const { register } = useFormContext();
@@ -29,7 +26,7 @@ export function NewCycleForm() {
         id="minutesAmount"
         placeholder="00"
         step={5}
-        min={1}
+        min={5}
         max={60}
         disabled={!!activeCycle}
         required

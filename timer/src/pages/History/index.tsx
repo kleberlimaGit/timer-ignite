@@ -1,6 +1,9 @@
+import { useContext } from "react";
+import { CyclesContext } from "../../contexts/CycleContext";
 import { HistoryContainer, HistoryList, Status } from "./styles";
 
 export function History() {
+  const { cycles } = useContext(CyclesContext);
   return (
     <HistoryContainer>
       <h1>History</h1>
@@ -18,28 +21,36 @@ export function History() {
 
           <tbody>
             <tr>
-                <td>Tarefa</td>
-                <td>20 minutos</td>
-                <td>Há 2 meses</td>
-                <td><Status statusColor="green">Concluído</Status></td>
+              <td></td>
+              <td>20 minutos</td>
+              <td>Há 2 meses</td>
+              <td>
+                <Status statusColor="green">Concluído</Status>
+              </td>
             </tr>
             <tr>
-                <td>Tarefa</td>
-                <td>20 minutos</td>
-                <td>Há 2 meses</td>
-                <td><Status statusColor="red">Interrompido</Status></td>
+              <td>Tarefa</td>
+              <td>20 minutos</td>
+              <td>Há 2 meses</td>
+              <td>
+                <Status statusColor="red">Interrompido</Status>
+              </td>
             </tr>
             <tr>
-                <td>Tarefa</td>
-                <td>20 minutos</td>
-                <td>Há 2 meses</td>
-                <td><Status statusColor="yellow">Em Andamento</Status></td>
+              <td>Tarefa</td>
+              <td>20 minutos</td>
+              <td>Há 2 meses</td>
+              <td>
+                <Status statusColor="yellow">Em Andamento</Status>
+              </td>
             </tr>
             <tr>
-                <td>Tarefa</td>
-                <td>20 minutos</td>
-                <td>Há 2 meses</td>
-                <td><Status statusColor="green">Concluído</Status></td>
+              <td>Tarefa</td>
+              <td>20 minutos</td>
+              <td>Há 2 meses</td>
+              <td>
+                <Status statusColor="green">Concluído</Status>
+              </td>
             </tr>
           </tbody>
         </table>
