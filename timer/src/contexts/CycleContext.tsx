@@ -1,5 +1,6 @@
-import { createContext, ReactNode, useState, useReducer } from "react";
-import { ActionTypes, addNewCycleAction, interrupteCycle, markCurrentCycleAsFinished } from "../reducers/cycles/actions";
+import { differenceInSeconds } from "date-fns";
+import { createContext, ReactNode, useState, useReducer, useEffect } from "react";
+import { addNewCycleAction, interrupteCycle, markCurrentCycleAsFinished } from "../reducers/cycles/actions";
 import { Cycle, cyclesReducer } from "../reducers/cycles/reducer";
 
 interface CyclesContextData {
@@ -33,13 +34,31 @@ export function CyclesContextProvider({
     // dados inicial do objeto   
     cycles: [],
     activeCycleId: null,
+  },() => {
+    const storageStateAsJSON = localStorage.getItem('@CYCLES-STATE')
+    if(storageStateAsJSON){
+      return JSON.parse(storageStateAsJSON)
+    }
   });
 
-  const [amountSecondsPassed, setAmountSecondPassed] = useState(0);
-
   const { cycles, activeCycleId } = cyclesState;
-
+  
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
+  const [amountSecondsPassed, setAmountSecondPassed] = useState(() => {
+    if (activeCycle) {
+      return differenceInSeconds(new Date(), new Date(activeCycle.startDate));
+    }
+    return 0;
+  });
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(cyclesState)
+
+    localStorage.setItem('@CYCLES-STATE', stateJSON)
+
+  },[cyclesState])
+
+
 
   function markCycleAsFinishedDate() {
     dispatch(markCurrentCycleAsFinished());

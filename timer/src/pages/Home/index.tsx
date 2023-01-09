@@ -26,7 +26,7 @@ export function Home() {
     task: zod.string().min(1, "Informe a tarefa"),
     minutesAmount: zod
       .number()
-      .min(1, "Valor mínimo deve ser 5 minutos")
+      .min(5, "Valor mínimo deve ser 5 minutos")
       .max(60, "Valor máximo deve ser 60 minutos"),
   });
 

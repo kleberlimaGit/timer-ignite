@@ -30,10 +30,10 @@ export function History() {
                 <tr key={cycle.id}>
                   <td>{cycle.task}</td>
                   <td>
-                    {cycle.interruptedDate && differenceInMinutes(cycle.interruptedDate, cycle.startDate) + ' minutos'} 
+                    {cycle.interruptedDate && differenceInMinutes(new Date(cycle.interruptedDate), new Date(cycle.startDate)) + ' minutos'} 
                     {!cycle.interruptedDate && cycle.minutesAmount + ' minutos'} 
                   </td>
-                  <td>{formatDistanceToNow(cycle.startDate, {addSuffix: true, locale:ptBR})}</td>
+                  <td>{formatDistanceToNow(new Date(cycle.startDate), {addSuffix: true, locale:ptBR})}</td>
                   <td>
                     {cycle.finishedDate && (
                       <Status statusColor="green">Concluído</Status>
